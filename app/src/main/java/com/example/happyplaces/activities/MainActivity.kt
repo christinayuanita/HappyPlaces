@@ -3,7 +3,10 @@ package com.example.happyplaces.activities
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.example.happyplaces.R
+import com.example.happyplaces.database.DatabaseHandler
+import com.example.happyplaces.models.HappyPlaceModel
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -14,10 +17,18 @@ class MainActivity : AppCompatActivity() {
         addHappyPlaceFab.setOnClickListener {
             val intent = Intent(this, AddHappyPlaceActivity::class.java)
             startActivity(intent)
+        }
+        getHappyPlacesListFromLocalDB()
+    }
 
-            addHappyPlaceFab.setOnClickListener {
-                val intent = Intent(this, AddHappyPlaceActivity::class.java)
-                startActivity(intent)
+    private fun getHappyPlacesListFromLocalDB(){
+        val dbHandler = DatabaseHandler(this)
+        val getHappyPlaceList: ArrayList<HappyPlaceModel> = dbHandler.getHappyPlacesList()
+
+        if(getHappyPlaceList.isNotEmpty()){
+            for(i in getHappyPlaceList){
+                Log.e("Title", i.title)
+                Log.e("Description", i.description)
             }
         }
     }
