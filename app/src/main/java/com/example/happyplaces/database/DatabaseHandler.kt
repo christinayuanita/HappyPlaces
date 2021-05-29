@@ -43,7 +43,7 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context, DATABASE_NAME
         onCreate(db)
     }
 
-    fun addHappyPlace(happyPlace: HappyPlaceModel): Long{
+    fun addHappyPlace(happyPlace: HappyPlaceModel): Long {
         val values = ContentValues()
         values.put(KEY_TITLE, happyPlace.title)
         values.put(KEY_IMAGE, happyPlace.image)
@@ -58,6 +58,6 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context, DATABASE_NAME
         db.close()
 
         return result
-
+    }
 
 }
