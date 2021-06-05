@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
+import android.location.LocationManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -97,7 +98,14 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         tv_add_image.setOnClickListener(this)
         btn_save.setOnClickListener(this)
         et_location.setOnClickListener(this)
+        tv_select_current_location.setOnClickListener(this)
     }
+
+    private fun isLocationEnabled(): Boolean{
+        val locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }
+
 
     override fun onClick(v: View?) {
         when(v!!.id){
@@ -170,6 +178,32 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                     startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE)
                 }catch (e: Exception){
                     e.printStackTrace()
+                }
+            }
+            R.id.tv_select_current_location -> {
+                if(!isLocationEnabled()){
+                    Toast.makeText(this, "Your location provider is turned off. Please turn it on", Toast.LENGTH_SHORT).show()
+
+                    val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                    startActivity(intent)
+                }else{
+                    Dexter.withActivity(this).withPermissions(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ).withListener(object: MultiplePermissionsListener{
+                        override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                            if(report!!.areAllPermissionsGranted()){
+                                Toast.makeText(this@AddHappyPlaceActivity, "Location permission is granted. Now you can get the current location ", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        override fun onPermissionRationaleShouldBeShown(
+                            permissions: MutableList<PermissionRequest>?,
+                            token: PermissionToken?
+                        ) {
+                            showRationalDialogForPermissions()
+                        }
+                    }).onSameThread().check()
                 }
             }
         }
